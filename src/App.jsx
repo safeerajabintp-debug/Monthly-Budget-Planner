@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { WalletIcon, BanknotesIcon, ChartBarIcon, TrashIcon } from "@heroicons/react/24/solid";
 
 
 export default function App() {
@@ -9,27 +10,34 @@ export default function App() {
   const [data, setData] = useState({});
 
   const handleAddExpense = () => {
-    if (!selectedMonth || !expenseName || !expenseAmount) return;
+  if (!selectedMonth || !expenseName || !expenseAmount) return;
 
-    const newExpense = {
-      id: Date.now(),
-      name: expenseName,
-      amount: Number(expenseAmount),
-    };
+  // Prevent negative or zero amounts
+  if (Number(expenseAmount) <= 0) {
+    alert("Amount must be greater than 0");
+    return;
+  }
 
-    const monthData = data[selectedMonth] || { budget: 0, expenses: [] };
-
-    setData({
-      ...data,
-      [selectedMonth]: {
-        ...monthData,
-        expenses: [...monthData.expenses, newExpense],
-      },
-    });
-
-    setExpenseName("");
-    setExpenseAmount("");
+  const newExpense = {
+    id: Date.now(),
+    name: expenseName,
+    amount: Number(expenseAmount),
   };
+
+  const monthData = data[selectedMonth] || { budget: 0, expenses: [] };
+
+  setData({
+    ...data,
+    [selectedMonth]: {
+      ...monthData,
+      expenses: [...monthData.expenses, newExpense],
+    },
+  });
+
+  setExpenseName("");
+  setExpenseAmount("");
+};
+
 
   const handleDelete = (id) => {
     const monthData = data[selectedMonth];
@@ -59,16 +67,36 @@ export default function App() {
   const remaining = monthData.budget - totalSpent;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200">
+
+    
+    <div className="relative min-h-screen flex flex-col">
+      {/* Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+      >
+        <source src="/videos/bg-video.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay for readability */}
+      {/* <div className="absolute top-0 left-0 w-full h-full bg-black/40 -z-0"></div> */}
+    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-orange-200 to-pink-200">
+      {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
       {/* NAVBAR WITH ICON */}
-      <nav className="bg-white shadow-md px-6 py-4 flex items-center gap-3">
-        {/* <BanknotesIcon className="w-10 h-10 text-blue-600" /> */}
-        <h1 className="text-2xl font-bold text-gray-800">Budget Planner</h1>
+      <nav className="bg-gradient-to-r from-blue-500 to-purple-600 shadow-md px-6 py-4 flex items-center gap-3 text-white">
+        <WalletIcon className="w-10 h-10" />
+        <h1 className="text-2xl font-bold">Budget Planner</h1>
       </nav>
-
-      <div className="p-6 flex justify-center">
-        <div className="w-full max-w-3xl bg-white shadow-xl rounded-xl p-8 border border-gray-200">
+     
+      {/* <div className="p-6 flex justify-center">
+        <div className="w-full max-w-3xl bg-white shadow-xl rounded-xl p-8 border border-gray-200"> */}
+        {/* Main Content */}
+      <div className="relative z-10 p-6 flex justify-center">
+        <div className="w-full max-w-3xl bg-white/90 backdrop-blur-md shadow-xl rounded-xl p-8 border border-gray-200">
 
           {/* Month Selector */}
           <div className="mb-6">
@@ -89,29 +117,56 @@ export default function App() {
             <div className="mb-8">
               <label className="block font-semibold mb-2 text-gray-700">Set Monthly Budget</label>
               <input
-                type="number"
-                className="w-full border rounded-lg p-3 shadow-sm focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter budget amount"
-                value={budget}
-                onChange={(e) => handleBudgetChange(e.target.value)}
-              />
+  type="number"
+  min="1"
+  className="w-full border rounded-lg p-3 shadow-sm focus:ring-2 focus:ring-blue-400"
+  placeholder="Enter budget amount"
+  value={budget}
+  onChange={(e) => {
+    if (Number(e.target.value) <= 0) {
+      alert("Budget must be greater than 0");
+      return;
+    }
+    handleBudgetChange(e.target.value);
+  }}
+/>
+
             </div>
           )}
 
           {/* Summary Cards */}
           {selectedMonth && (
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-200 text-center">
+              {/* <div className="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-200 text-center">
+                <h2 className="font-bold text-blue-700">Total Budget</h2>
+                <p className="text-2xl font-semibold">{monthData.budget} AED</p>
+              </div> */}
+              {/* <div className="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-200 text-center"> */}
+              <div className="bg-gray-50 p-4 rounded-lg shadow-sm border hover:shadow-lg transition text-center">
+                <WalletIcon className="w-8 h-8 mx-auto text-blue-600 mb-2" />
                 <h2 className="font-bold text-blue-700">Total Budget</h2>
                 <p className="text-2xl font-semibold">{monthData.budget} AED</p>
               </div>
 
-              <div className="bg-red-50 p-5 rounded-xl shadow-sm border border-red-200 text-center">
+              {/* <div className="bg-red-50 p-5 rounded-xl shadow-sm border border-red-200 text-center">
+                <h2 className="font-bold text-red-700">Spent</h2>
+                <p className="text-2xl font-semibold">{totalSpent} AED</p>
+              </div> */}
+              {/* <div className="bg-red-50 p-5 rounded-xl shadow-sm border border-red-200 text-center"> */}
+              <div className="bg-gray-50 p-4 rounded-lg shadow-sm border hover:shadow-lg transition text-center">
+                <BanknotesIcon className="w-8 h-8 mx-auto text-red-600 mb-2" />
                 <h2 className="font-bold text-red-700">Spent</h2>
                 <p className="text-2xl font-semibold">{totalSpent} AED</p>
               </div>
 
-              <div className="bg-green-50 p-5 rounded-xl shadow-sm border border-green-200 text-center">
+              {/* <div className="bg-green-50 p-5 rounded-xl shadow-sm border border-green-200 text-center">
+                <h2 className="font-bold text-green-700">Remaining</h2>
+                <p className="text-2xl font-semibold">{remaining} AED</p>
+              </div> */}
+
+              {/* <div className="bg-green-50 p-5 rounded-xl shadow-sm border border-green-200 text-center"> */}
+              <div className="bg-gray-50 p-4 rounded-lg shadow-sm border hover:shadow-lg transition text-center">
+                <ChartBarIcon className="w-8 h-8 mx-auto text-green-600 mb-2" />
                 <h2 className="font-bold text-green-700">Remaining</h2>
                 <p className="text-2xl font-semibold">{remaining} AED</p>
               </div>
@@ -131,6 +186,7 @@ export default function App() {
 
               <input
                 type="number"
+                 min="1"
                 className="w-32 border rounded-lg p-3 shadow-sm focus:ring-2 focus:ring-blue-400"
                 placeholder="Amount"
                 value={expenseAmount}
@@ -139,7 +195,9 @@ export default function App() {
 
               <button
                 onClick={handleAddExpense}
-                className="bg-blue-600 text-white px-5 rounded-lg hover:bg-blue-700 shadow-md"
+                // className="bg-blue-600 text-white px-5 rounded-lg hover:bg-blue-700 shadow-md"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 shadow-md"
+
               >
                 Add
               </button>
@@ -162,12 +220,19 @@ export default function App() {
                       <p className="text-gray-600">{exp.amount} AED</p>
                     </div>
 
-                    <button
+                    {/* <button
                       onClick={() => handleDelete(exp.id)}
                       className="text-red-600 font-bold text-xl hover:text-red-800"
                     >
                       ✖
+                    </button> */}
+                    <button
+                      onClick={() => handleDelete(exp.id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      <TrashIcon className="w-6 h-6" />
                     </button>
+
                   </div>
                 ))}
 
@@ -180,5 +245,6 @@ export default function App() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
