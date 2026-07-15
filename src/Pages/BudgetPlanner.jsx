@@ -1,5 +1,7 @@
 import React from 'react'
 import { WalletIcon, BanknotesIcon, ChartBarIcon, TrashIcon,PencilIcon} from "@heroicons/react/24/solid";
+import { useState, useEffect } from "react";
+import bg1Video from "/videos/bg1-video.mp4";
 
 function BudgetPlanner() {
 const [selectedMonth, setSelectedMonth] = useState("");
@@ -9,6 +11,34 @@ const [selectedMonth, setSelectedMonth] = useState("");
   const [data, setData] = useState({});
   const [editingId, setEditingId] = useState(null);
 
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+  // 🔹 Load saved data when component mounts
+  useEffect(() => {
+    if (currentUser) {
+      const savedData = JSON.parse(
+        localStorage.getItem(`budgetData_${currentUser.email}`)
+      );
+      if (savedData) {
+        setData(savedData);
+      }
+    }
+  }, []);
+
+  // 🔹 Save data whenever it changes
+  useEffect(() => {
+    if (currentUser && Object.keys(data).length > 0) {
+      localStorage.setItem(
+        `budgetData_${currentUser.email}`,
+        JSON.stringify(data)
+      );
+    }
+  }, [data]);
+  // 🔹 Logout without deleting data
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser"); // only clears session
+    window.location.href = "/Monthly-Budget-Planner/#/";
+  };
 
  const handleAddExpense = () => {
   if (!selectedMonth || !expenseName || !expenseAmount) return;
@@ -88,35 +118,48 @@ const [selectedMonth, setSelectedMonth] = useState("");
   const totalSpent = monthData.expenses.reduce((acc, item) => acc + item.amount, 0);
   const remaining = monthData.budget - totalSpent;
 
+
+  
+
   return (
-     <div className="relative min-h-screen flex flex-col">
+     <div className="min-h-screen flex flex-col">
+      
       {/* Background Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
-      >
-        <source src="/videos/bg-video.mp4" type="video/mp4" />
+      <video autoPlay loop muted playsInline className="fixed top-0 left-0 w-full h-full object-cover -z-10">
+        <source src={bg1Video} type="video/mp4" />
       </video>
 
       {/* Overlay for readability */}
       {/* <div className="absolute top-0 left-0 w-full h-full bg-black/40 -z-0"></div> */}
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-orange-200 to-pink-200">
+    {/* <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-orange-200 to-pink-200"> */}
       {/* <div className="absolute inset-0 bg-black/30"></div> */}
 
       {/* NAVBAR WITH ICON */}
-      <nav className="bg-gradient-to-r from-blue-500 to-purple-600 shadow-md px-6 py-4 flex items-center gap-3 text-white">
-        <WalletIcon className="w-10 h-10" />
-        <h1 className="text-2xl font-bold">Budget Planner</h1>
-      </nav>
+<nav className="bg-gradient-to-r from-blue-500 to-purple-600 shadow-md px-6 py-4 mt-1 flex items-center gap-3 text-white rounded-4xl
+       shadow-xl flex justify-between ">
+            <div className="flex items-center gap-3">
+      <WalletIcon className="w-10 h-10" />
+      <h1 className="text-2xl font-bold">Budget Planner</h1>
+    </div>
+
+    <div className="flex items-center gap-4">
+    <span className="font-semibold">
+      Welcome, {currentUser?.name || "User"}
+    </span>
+    <button
+      onClick={handleLogout}
+      className="bg-red-600 px-3 py-1 rounded-4xl hover:bg-red-700 transition"
+    >
+      Logout
+    </button>
+    </div>
+  </nav>
      
       {/* <div className="p-6 flex justify-center">
         <div className="w-full max-w-3xl bg-white shadow-xl rounded-xl p-8 border border-gray-200"> */}
         {/* Main Content */}
       <div className="relative z-10 p-6 flex justify-center">
-        <div className="w-full max-w-3xl bg-white/90 backdrop-blur-md shadow-xl rounded-xl p-8 border border-gray-200">
+        <div className="w-full max-w-3xl bg-white/90 backdrop-blur-md shadow-xl rounded-xl p-8 border border-gray-200 opacity-85">
 
           {/* Month Selector */}
           <div className="mb-6">
@@ -155,8 +198,9 @@ const [selectedMonth, setSelectedMonth] = useState("");
           )}
 
           {/* Summary Cards */}
+          
           {selectedMonth && (
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-3 grid-cols-1 md:grid-cols-3  gap-4 mb-8 ">
               {/* <div className="bg-blue-50 p-5 rounded-xl shadow-sm border border-blue-200 text-center">
                 <h2 className="font-bold text-blue-700">Total Budget</h2>
                 <p className="text-2xl font-semibold">{monthData.budget} AED</p>
@@ -200,6 +244,7 @@ const [selectedMonth, setSelectedMonth] = useState("");
 
             </div>
           )}
+          
 
           {/* Add Expense */}
           {selectedMonth && (
@@ -264,7 +309,7 @@ const [selectedMonth, setSelectedMonth] = useState("");
         </div>
       </div>
     </div>
-  </div>
+
   )
 }
 

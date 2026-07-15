@@ -5,12 +5,14 @@ import BudgetPlanner from "./Pages/BudgetPlanner";
 function App() {
   return (
     <Router>
-  <Routes>
-    <Route path="/" element={<AuthPage />} />
-    <Route path="/budget-planner" element={<BudgetPlanner />} />
-  </Routes>
-</Router>
+      <Routes>
+        {/* Default route → AuthPage */}
+        <Route path="/" element={<AuthPage />} />
 
+        {/* Budget Planner route */}
+        <Route path="/budget-planner" element={<BudgetPlanner />} />
+      </Routes>
+    </Router>
   );
 }
 
